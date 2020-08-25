@@ -6,7 +6,7 @@ class Route {
 		
 		$url = trim($_SERVER['REQUEST_URI']);
 		if (!$url || $url === '/' || $url === 'index') {
-			$controllerName = 'statistics';
+			$controllerName = 'Shmixit';
 			$method = 'index';
 		} else {
 			$urlArray = explode('/', $url);
