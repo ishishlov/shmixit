@@ -27,14 +27,12 @@
 			</div>
 		</nav>
 
-		<h1>Добро пожаловать {{ userName }}!</h1>
+		<h1>Добро пожаловать {{ user.getName }}!</h1>
 		<form action="/Shmixit/room" method="post">
-			<input type="submit" name="create" value="Создать игру" />
-			<input type="submit" name="join" value="Присоединиться к игре" />
-			<input type="submit" name="show" value="Просмотр игры" />
+			<input type="submit" name="create" value="Создать новую игру" />
 		</form>
 
-		{% if availableRooms is empty %}
+		{% if rooms is empty %}
 		<h3>Доступные игры</h3>
 			<h3>Нет доступных игр. Походу надо создавать новую</h3>
 		{% else %}
@@ -45,15 +43,24 @@
 					<th>Название</th>
 					<th>Создатель</th>
 					<th>Состояние</th>
+					<th>Действие</th>
 				</tr>
 				</thead>
 				<tbody>
-				{% for room in availableRooms %}
+				{% for room in rooms %}
 					<tr>
-						<td>room.room_id</td>
-						<td>room.name</td>
-						<td>room.admin_user</td>
-						<td>room.status</td>
+						<td>{{ room.roomId }}</td>
+						<td>{{ room.name }}</td>
+						<td>{{ room.adminUser.name }}</td>
+						<td>{{ room.statusName }}</td>
+						<td>
+							{% if room.status == 1 and not user.isGuest %}
+								<button type="submit" class="btn btn-outline-dark">Войти</button>
+							{% endif %}
+							{% if room.status == 2 or room.status == 3 %}
+								<button type="submit" class="btn btn-outline-dark">Просмотр</button>
+							{% endif %}
+						</td>
 					</tr>
 				{% endfor %}
 				</tbody>

@@ -46,13 +46,13 @@ class User
     }
 
     /**
-     * @param array $result
+     * @param array $data
      * @return Domain[]
      */
-    private function map(array $result): array
+    private function map(array $data): array
     {
         $users = [];
-        foreach ($result as $user) {
+        foreach ($data as $user) {
             $users[] = new Domain($user['user_id'], $user['name'], $user['avatar']);
         }
 

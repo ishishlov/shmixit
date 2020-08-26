@@ -18,10 +18,6 @@ class User extends Common {
 
     public function delete(): void
     {
-	    $model = new Models\Room();
-	    $data = $model->getRooms();
-	    $this->vd($data);
-	    exit;
-//        $this->display('index.tpl');
+
     }
 }
