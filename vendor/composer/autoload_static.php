@@ -20,10 +20,15 @@ class ComposerStaticInitde4ada0e41310d7587e421fc9bca79fa
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Ctype\\' => 23,
+            'Services\\' => 9,
         ),
         'M' => 
         array (
             'Models\\' => 7,
+        ),
+        'D' => 
+        array (
+            'Domain\\' => 7,
         ),
     );
 
@@ -40,9 +45,17 @@ class ComposerStaticInitde4ada0e41310d7587e421fc9bca79fa
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
+        'Services\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/Services',
+        ),
         'Models\\' => 
         array (
             0 => __DIR__ . '/../..' . '/Models',
+        ),
+        'Domain\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/Domain',
         ),
     );
 

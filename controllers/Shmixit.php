@@ -3,18 +3,23 @@ require_once __DIR__ . '/Common.php';
 
 class Shmixit extends Common {
 	
-	private $_model = null;
+	private $serviceUser;
 
-	public function index() {
-	    $this->_data['name'] = 'Шмиксит!';
+	public function index(): void
+    {
+        $userService = new Services\User();
+	    $this->tplData['userName'] = $this->user->getName();
+	    $this->tplData['availableRooms'] = (new Services\Room())->getAvailableRooms();
+	    $this->tplData['users'] = $userService->getAll();
+
         $this->display('index.tpl');
 	}
 
-    public function room() {
+    public function room(): void
+    {
 	    $model = new Models\Room();
 	    $data = $model->getRooms();
 	    $this->vd($data);
 	    exit;
-//        $this->display('index.tpl');
     }
 }
