@@ -33,4 +33,14 @@ class RoomStatuses
     {
         return array_keys(self::STATUSES);
     }
+
+    public static function getCreateStatus(): int
+    {
+        return self::STATUS_CREATED;
+    }
+
+    public static function isActive(int $status): int
+    {
+        return self::STATUS_ACTIVE === $status;
+    }
 }

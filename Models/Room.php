@@ -2,6 +2,7 @@
 
 namespace Models;
 
+use Domain\User;
 use PDO;
 
 class Room extends Main {
@@ -15,7 +16,17 @@ class Room extends Main {
         );
         $sth->execute([$roomId]);
 
-        return $sth->fetch(PDO::FETCH_ASSOC);
+        return $sth->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function save(User $user, int $status, string $roomName): int
+    {
+        $stmt = $this->_db->prepare(
+            'INSERT INTO ' . self::TABLE_NAME . ' (status, name, admin_user_id) VALUES (?, ?, ?)'
+        );
+        $res = $stmt->execute([$status, $roomName, $user->getUserId()]);
+        return $res ? $this->_db->lastInsertId() : 0;
+
     }
 
     public function getRooms(array $statuses): array

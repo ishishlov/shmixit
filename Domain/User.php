@@ -43,4 +43,9 @@ class User
     {
         return !(bool) $this->userId;
     }
+
+    public function isEqual(User $user): bool
+    {
+        return $user->getUserId() === $this->userId;
+    }
 }

@@ -13,15 +13,16 @@
 
 			<div class="collapse navbar-collapse" id="navbarCollapse">
 				<form class="form-inline ml-auto">
-					{% if users is empty %}
-						<button type="submit" class="btn btn-outline-light">Добавить игрока</button>
-					{% else %}
+					{% if user.isGuest %}
 						<select>
 							<option id="0">Выберите игрока</option>
 							{% for user in users %}
 							<option id="{{ user.user_id }}">{{ user.name|e }}</option>
 							{% endfor %}
 						</select>
+					{% else %}
+					<div class="">{{ user.getName }}</div>
+						<button class="btn btn-outline-light">Выйти</button>
 					{% endif %}
 				</form>
 			</div>
