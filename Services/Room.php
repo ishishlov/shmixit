@@ -14,21 +14,22 @@ use Exception;
 class Room
 {
     private const DEFAULT_ROOM_ID = 0;
+    private const DEFAULT_GAME_ID = 0;
 
-    private $model;
+    private $roomModel;
     private $roomUsersModel;
     private $userService;
 
     public function __construct()
     {
-        $this->model = new Model();
+        $this->roomModel = new Model();
         $this->roomUsersModel = new RoomUsers();
         $this->userService = new UserService();
     }
 
     public function getAllRooms(): array
     {
-        $rooms = $this->model->getRooms(RoomStatuses::getAllStatuses());
+        $rooms = $this->roomModel->getRooms(RoomStatuses::getAllStatuses());
 
         if (!$rooms) {
             return [];
@@ -51,12 +52,13 @@ class Room
         }
 
         try {
-            $roomId = $this->model->save($user, RoomStatuses::getCreateStatus(), $roomName);
-            if ($roomId) {
-                $this->roomUsersModel->save($user, $roomId);
+            $room = new Domain(null, RoomStatuses::getCreateStatus(), $roomName, $user, RoomStatuses::getName(RoomStatuses::getCreateStatus()));
+            $savedRoom = $this->roomModel->save($room);
+            if ($savedRoom->getRoomId()) {
+                $this->roomUsersModel->save($user, $savedRoom->getRoomId());
             }
 
-            return $this->getAnswerForCreate('', $roomId);
+            return $this->getAnswerForCreate('', $savedRoom->getRoomId());
         } catch (Exception $e) {
             return $this->getAnswerForCreate('Ошибка при сохранении. ' . $e->getMessage());
         }
@@ -68,7 +70,7 @@ class Room
             return $this->getAnswerForConnecting('Ошибка входа в игру. Не удалось подключиться');
         }
 
-        $roomData = $this->model->get($roomId);
+        $roomData = $this->roomModel->get($roomId);
         if (!$roomData) {
             return $this->getAnswerForConnecting('Игра не была создана');
         }
@@ -89,10 +91,22 @@ class Room
     public function update(User $user, ?int $roomId): array
     {
         $roomUsers = $this->getRoomUsers($roomId);
-        $roomData = $this->model->get($roomId);
-        $startGame = RoomStatuses::isActive($roomData['status']);
+        $room = $this->getRoom($roomId);
+        $startGame = RoomStatuses::isActive($room->getStatus());
 
         return $this->getAnswerForConnecting('', $roomUsers->getCount(), $roomUsers->getMessages(), $startGame);
+    }
+
+    public function start(User $user, ?int $roomId): array
+    {
+        $room = $this->getRoom($roomId);
+        if (!$room->isAdmin($user)) {
+            return $this->getAnswerForStart('Лишь избранный наделен властью запускать игру. Зовите создателя');
+        }
+
+        $gameId = $this->startGame($room);
+
+        return $this->getAnswerForStart('', $gameId);
     }
 
     private function getAdditionalData(array $rooms): array
@@ -141,6 +155,15 @@ class Room
         return $users;
     }
 
+    private function getRoom(int $roomId): Domain
+    {
+        $roomData = $this->roomModel->get($roomId);
+        $roomDataWithAdditionalData = $this->getAdditionalData([$roomData]);
+        $room = $this->map($roomDataWithAdditionalData);
+
+        return $room[0];
+    }
+
     private function getRoomUsers(int $roomId): RoomUsersDomain
     {
         $roomUsersFromDB = $this->roomUsersModel->get($roomId);
@@ -151,6 +174,15 @@ class Room
         $usersInRoom = $this->userService->getByIds($roomUserIds);
 
         return new RoomUsersDomain($roomId, $usersInRoom);
+    }
+
+    private function startGame(Domain $room): int
+    {
+        $room->setStatus(RoomStatuses::getActiveStatus());
+        $savedRoom = $this->roomModel->save($room);
+
+        //ToDo доделать логику
+        return 0;
     }
 
     private function getAnswerForCreate(string $error, ?int $roomId = self::DEFAULT_ROOM_ID): array
@@ -168,6 +200,14 @@ class Room
             'count_players' => $countPlayers,
             'messages' => $messages,
             'start_game' => $startGame
+        ];
+    }
+
+    private function getAnswerForStart(string $error, ?int $gameId = self::DEFAULT_GAME_ID): array
+    {
+        return [
+            'error' => $error,
+            'game_id' => $gameId
         ];
     }
 }

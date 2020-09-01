@@ -20,6 +20,22 @@ class Room
     }
 
     /**
+     * @param int|null $roomId
+     */
+    public function setRoomId(?int $roomId): void
+    {
+        $this->roomId = $roomId;
+    }
+
+    /**
+     * @param int|null $status
+     */
+    public function setStatus(?int $status): void
+    {
+        $this->status = $status;
+    }
+
+    /**
      * @return int|null
      */
     public function getRoomId(): ?int
@@ -57,5 +73,10 @@ class Room
     public function getStatusName(): ?string
     {
         return $this->statusName;
+    }
+
+    public function isAdmin(User $user): bool
+    {
+        return $user->getUserId() === $this->adminUser->getUserId();
     }
 }

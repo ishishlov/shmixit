@@ -2,6 +2,7 @@
 
 namespace Models;
 
+use Domain\Room as Domain;
 use Domain\User;
 use PDO;
 
@@ -16,17 +17,19 @@ class Room extends Main {
         );
         $sth->execute([$roomId]);
 
-        return $sth->fetchAll(PDO::FETCH_ASSOC);
+        return $sth->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function save(User $user, int $status, string $roomName): int
+    public function save(Domain $room): Domain
     {
         $stmt = $this->_db->prepare(
             'INSERT INTO ' . self::TABLE_NAME . ' (status, name, admin_user_id) VALUES (?, ?, ?)'
         );
-        $res = $stmt->execute([$status, $roomName, $user->getUserId()]);
-        return $res ? $this->_db->lastInsertId() : 0;
+        $res = $stmt->execute([$room->getStatus(), $room->getName(), $room->getAdminUser()->getUserId()]);
+        $roomId = $res ? $this->_db->lastInsertId() : 0;
+        $room->setRoomId($roomId);
 
+        return $room;
     }
 
     public function getRooms(array $statuses): array

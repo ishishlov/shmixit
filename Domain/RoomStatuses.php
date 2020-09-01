@@ -39,6 +39,16 @@ class RoomStatuses
         return self::STATUS_CREATED;
     }
 
+    public static function getActiveStatus(): int
+    {
+        return self::STATUS_ACTIVE;
+    }
+
+    public static function getFinishedStatus(): int
+    {
+        return self::STATUS_FINISHED;
+    }
+
     public static function isActive(int $status): int
     {
         return self::STATUS_ACTIVE === $status;
