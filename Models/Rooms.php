@@ -3,12 +3,11 @@
 namespace Models;
 
 use Domain\Room as Domain;
-use Domain\User;
 use PDO;
 
-class Room extends Main {
+class Rooms extends Main {
 
-    private const TABLE_NAME = 'room';
+    private const TABLE_NAME = 'rooms';
 
     public function get(int $roomId): array
     {

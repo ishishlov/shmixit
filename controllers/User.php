@@ -7,7 +7,7 @@ class User extends Common {
 
 	public function __construct()
     {
-        $this->_model = new Models\User();
+        $this->_model = new Models\Users();
     }
 
     public function create(): void

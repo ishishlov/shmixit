@@ -9,14 +9,16 @@ class Room
     private $name;
     private $adminUser;
     private $statusName;
+    private $dateCreate;
 
-    public function __construct(?int $roomId = null, ?int $status = null, ?string $name = null, ?User $adminUser = null, ?string $statusName = '')
+    public function __construct(?int $roomId = null, ?int $status = null, ?string $name = null, ?User $adminUser = null, ?string $statusName = '', ?string $dateCreate = '')
     {
         $this->roomId = $roomId;
         $this->status = $status;
         $this->name = $name;
         $this->adminUser = $adminUser;
         $this->statusName = $statusName;
+        $this->dateCreate = $dateCreate;
     }
 
     /**
@@ -73,6 +75,14 @@ class Room
     public function getStatusName(): ?string
     {
         return $this->statusName;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDateCreate(): ?string
+    {
+        return $this->dateCreate;
     }
 
     public function isAdmin(User $user): bool

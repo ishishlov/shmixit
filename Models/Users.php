@@ -4,7 +4,7 @@ namespace Models;
 
 use PDO;
 
-class User extends Main {
+class Users extends Main {
 
     private const TABLE_NAME = 'users';
 

@@ -3,12 +3,13 @@
 namespace Services;
 
 use Models\RoomUsers;
-use Models\Room as Model;
+use Models\Rooms as Model;
 use Domain\Room as Domain;
 use Domain\RoomStatuses;
 use Domain\User;
 use Domain\RoomUsers as RoomUsersDomain;
 use Services\User as UserService;
+use Services\Game as GameService;
 use Exception;
 
 class Room
@@ -19,12 +20,14 @@ class Room
     private $roomModel;
     private $roomUsersModel;
     private $userService;
+    private $gameService;
 
     public function __construct()
     {
         $this->roomModel = new Model();
         $this->roomUsersModel = new RoomUsers();
         $this->userService = new UserService();
+        $this->gameService = new GameService();
     }
 
     public function getAllRooms(): array
@@ -52,7 +55,14 @@ class Room
         }
 
         try {
-            $room = new Domain(null, RoomStatuses::getCreateStatus(), $roomName, $user, RoomStatuses::getName(RoomStatuses::getCreateStatus()));
+            $room = new Domain(
+                null,
+                RoomStatuses::getCreateStatus(),
+                $roomName,
+                $user,
+                RoomStatuses::getName(RoomStatuses::getCreateStatus()),
+                date('Y-m-d H:i:s')
+            );
             $savedRoom = $this->roomModel->save($room);
             if ($savedRoom->getRoomId()) {
                 $this->roomUsersModel->save($user, $savedRoom->getRoomId());
@@ -148,7 +158,8 @@ class Room
                 $room['status'],
                 $room['name'],
                 $room['admin_user'],
-                $room['status_name']
+                $room['status_name'],
+                $room['date_create']
             );
         }
 
@@ -181,8 +192,10 @@ class Room
         $room->setStatus(RoomStatuses::getActiveStatus());
         $savedRoom = $this->roomModel->save($room);
 
+        $game = $this->gameService->start($savedRoom);
+
         //ToDo доделать логику
-        return 0;
+        return $game->getGameId();
     }
 
     private function getAnswerForCreate(string $error, ?int $roomId = self::DEFAULT_ROOM_ID): array

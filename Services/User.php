@@ -2,7 +2,7 @@
 
 namespace Services;
 
-use Models\User as Model;
+use Models\Users as Model;
 use Domain\User as Domain;
 
 class User
