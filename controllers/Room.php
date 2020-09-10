@@ -4,8 +4,8 @@ require_once __DIR__ . '/Common.php';
 
 use Services\Room as RoomService;
 
-class Room extends Common {
-
+class Room extends Common
+{
     /**
      * @var RoomService
      */

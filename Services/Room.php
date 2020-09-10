@@ -21,6 +21,7 @@ class Room
     private $roomUsersModel;
     private $userService;
     private $gameService;
+    private $cardService;
 
     public function __construct()
     {
@@ -28,6 +29,7 @@ class Room
         $this->roomUsersModel = new RoomUsers();
         $this->userService = new UserService();
         $this->gameService = new GameService();
+        $this->cardService = new CardService();
     }
 
     public function getAllRooms(): array
@@ -192,7 +194,10 @@ class Room
         $room->setStatus(RoomStatuses::getActiveStatus());
         $savedRoom = $this->roomModel->save($room);
 
-        $game = $this->gameService->start($savedRoom);
+        $game = $this->gameService->create($savedRoom);
+        $roomUsers = $this->getRoomUsers($room->getRoomId());
+        $cards = $this->cardService->getPlayerCards($roomUsers->getUserIds());
+        $this->gameService->start($game, $cards);
 
         //ToDo доделать логику
         return $game->getGameId();

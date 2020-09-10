@@ -1,12 +1,14 @@
 <?php
+
 require_once __DIR__ . '/Common.php';
 
-class User extends Common {
-	
+class User extends Common
+{
 	private $_model = null;
 
 	public function __construct()
     {
+        parent::__construct();
         $this->_model = new Models\Users();
     }
 

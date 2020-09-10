@@ -16,11 +16,17 @@ class Game
         $this->gameModel = new Model();
     }
 
-    public function start(Room $room): Domain
+    public function create(Room $room): Domain
     {
         $date = date('Y-m-d H:i:s');
         $game = new Domain(null, $room, GameStatuses::getActiveStatus(), $date);
 
         return $this->gameModel->save($game);
+    }
+
+    public function start(Domain $game, array $cards)
+    {
+        //ToDo сделать логику сохранения первого раунда
+        return true;
     }
 }

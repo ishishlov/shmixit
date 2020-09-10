@@ -5,7 +5,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Services\User;
 use Services\Auth;
 
-class Common {
+class Common
+{
     /** @var array  */
 	protected $tplData = [];
 	/** @var User */

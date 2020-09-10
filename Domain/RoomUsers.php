@@ -63,4 +63,14 @@ class RoomUsers
 
         return $messages;
     }
+
+    public function getUserIds(): array
+    {
+        return array_map(
+            static function(User $user) {
+                return $user->getUserId();
+            },
+            $this->users
+        );
+    }
 }

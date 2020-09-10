@@ -2,9 +2,9 @@
 
 require_once __DIR__ . '/Common.php';
 
-class Shmixit extends Common {
-	
-	private $serviceUser;
+class Shmixit extends Common
+{
+    private $serviceUser;
 
 	public function index(): void
     {
