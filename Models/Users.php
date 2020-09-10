@@ -2,20 +2,19 @@
 
 namespace Models;
 
+use Domain\User;
 use PDO;
 
 class Users extends Main {
 
     private const TABLE_NAME = 'users';
+    private const ID_FIELD_NAME = 'user_id';
 
-    public function get(int $id)
+    public function __construct()
     {
-        $sth = $this->_db->prepare(
-            'SELECT * FROM ' . self::TABLE_NAME . ' WHERE user_id = ?'
-        );
-        $sth->execute([$id]);
-
-        return $sth->fetch(PDO::FETCH_ASSOC);
+        $this->tableName = self::TABLE_NAME;
+        $this->idFieldName = self::ID_FIELD_NAME;
+        parent::__construct();
     }
 
     public function getByIds(array $ids): array
@@ -33,7 +32,7 @@ class Users extends Main {
     }
 
     /**
-     * @return \Domain\User[]
+     * @return User[]
      */
     public function getAll(): array
     {

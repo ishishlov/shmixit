@@ -177,7 +177,7 @@ class Room
 
     private function getRoomUsers(int $roomId): RoomUsersDomain
     {
-        $roomUsersFromDB = $this->roomUsersModel->get($roomId);
+        $roomUsersFromDB = $this->roomUsersModel->get($roomId, true);
         $roomUserIds = [];
         foreach ($roomUsersFromDB as $roomUser) {
             $roomUserIds[] = (int) $roomUser['user_id'];

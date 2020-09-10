@@ -3,20 +3,17 @@
 namespace Models;
 
 use Domain\Game;
-use PDO;
 
 class Games extends Main {
 
     private const TABLE_NAME = 'games';
+    private const ID_FIELD_NAME = 'game_id';
 
-    public function get(int $gameId): array
+    public function __construct()
     {
-        $sth = $this->_db->prepare(
-            'SELECT * FROM ' . self::TABLE_NAME . ' WHERE game_id = ?'
-        );
-        $sth->execute([$gameId]);
-
-        return $sth->fetch(PDO::FETCH_ASSOC);
+        $this->tableName = self::TABLE_NAME;
+        $this->idFieldName = self::ID_FIELD_NAME;
+        parent::__construct();
     }
 
     public function save(Game $game): Game

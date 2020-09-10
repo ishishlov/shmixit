@@ -8,15 +8,13 @@ use PDO;
 class Rooms extends Main {
 
     private const TABLE_NAME = 'rooms';
+    private const ID_FIELD_NAME = 'room_id';
 
-    public function get(int $roomId): array
+    public function __construct()
     {
-        $sth = $this->_db->prepare(
-            'SELECT * FROM ' . self::TABLE_NAME . ' WHERE room_id = ?'
-        );
-        $sth->execute([$roomId]);
-
-        return $sth->fetch(PDO::FETCH_ASSOC);
+        $this->tableName = self::TABLE_NAME;
+        $this->idFieldName = self::ID_FIELD_NAME;
+        parent::__construct();
     }
 
     public function save(Domain $room): Domain

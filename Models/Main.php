@@ -8,12 +8,28 @@ class Main {
 
     /** @var PDO|null */
 	protected $_db = null;
+	/** @var string */
+	protected $tableName;
+    /** @var string */
+	protected $idFieldName;
 
 	public function __construct() {
 		if (!$this->_db) {
 			$this->_db = (new DB())->getInstance();
 		}
 	}
+
+    public function get(int $id, bool $multipleRecords = false): array
+    {
+        $sth = $this->_db->prepare(
+            'SELECT * FROM ' . $this->tableName . ' WHERE ' . $this->idFieldName . ' = ?'
+        );
+        $sth->execute([$id]);
+
+        return $multipleRecords
+            ? $sth->fetchAll(PDO::FETCH_ASSOC)
+            : $sth->fetch(PDO::FETCH_ASSOC);
+    }
 
 	/**
 	 * Метод для мультиинсерта
