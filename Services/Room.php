@@ -196,7 +196,7 @@ class Room
 
         $game = $this->gameService->create($savedRoom);
         $roomUsers = $this->getRoomUsers($room->getRoomId());
-        $cards = $this->cardService->getPlayerCards($roomUsers->getUserIds());
+        $cards = $this->cardService->generatePlayersCards($roomUsers->getUserIds());
         $this->gameService->start($game, $cards);
 
         //ToDo доделать логику

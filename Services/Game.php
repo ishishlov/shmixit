@@ -29,4 +29,9 @@ class Game
         //ToDo сделать логику сохранения первого раунда
         return true;
     }
+
+    public function getGame(): Domain
+    {
+
+    }
 }
