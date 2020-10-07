@@ -4,13 +4,14 @@ namespace Domain;
 
 class CardPlayers
 {
-    private $cardPlayers = [];
+    private $cardPlayers;
 
-    private function __construct($data)
+    /**
+     * @param CardPlayer[] $cardPlayers
+     */
+    private function __construct(array $cardPlayers)
     {
-        foreach ($data as $cardPlayer) {
-            $this->cardPlayers[] = CardPlayer::fromArray($cardPlayer);
-        }
+        $this->cardPlayers = $cardPlayers;
     }
 
     public function toJson(): string
@@ -22,5 +23,26 @@ class CardPlayers
     {
         //ToDo обработать ошибку Json
         return new self(json_decode($cardPlayers, true));
+    }
+
+    /**
+     * @param CardPlayer[] $cardPlayers
+     * @return self
+     */
+    public static function create(array $cardPlayers): self
+    {
+        return new self($cardPlayers);
+    }
+
+    public function suspendExtraCards(): void
+    {
+        foreach ($this->cardPlayers as $cardPlayer) {
+            $cardPlayer->suspendExtraCards();
+        }
+    }
+
+    public function takeNextCard(): void
+    {
+
     }
 }
