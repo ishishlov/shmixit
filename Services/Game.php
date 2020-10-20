@@ -2,6 +2,7 @@
 
 namespace Services;
 
+use Domain\CardPlayers;
 use Domain\GameStatuses;
 use Models\Games as Model;
 use Domain\Game as Domain;
@@ -24,8 +25,14 @@ class Game
         return $this->gameModel->save($game);
     }
 
-    public function start(Domain $game, array $cards)
+    /**
+     * @param Domain $game
+     * @param CardPlayers $playersCards
+     * @return bool
+     */
+    public function start(Domain $game, CardPlayers $playersCards)
     {
+
         //ToDo сделать логику сохранения первого раунда
         return true;
     }
