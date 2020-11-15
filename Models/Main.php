@@ -13,13 +13,16 @@ class Main {
     /** @var string */
 	protected $idFieldName;
 
-	public function __construct() {
+	public function __construct(string $tableName, string $idFieldName) {
+	    $this->tableName = $tableName;
+	    $this->idFieldName = $idFieldName;
+
 		if (!$this->_db) {
 			$this->_db = (new DB())->getInstance();
 		}
 	}
 
-    public function get(int $id, bool $multipleRecords = false): array
+    public function get(int $id, bool $multipleRecords = false)
     {
         $sth = $this->_db->prepare(
             'SELECT * FROM ' . $this->tableName . ' WHERE ' . $this->idFieldName . ' = ?'

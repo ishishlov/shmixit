@@ -17,7 +17,7 @@ class Room extends Common
         $this->service = new RoomService();
     }
 
-    public function createRoom(): void
+    public function create(): void
     {
         $answer = $this->service->createRoom($this->user, (string) $_POST['room_name']);
 
@@ -26,9 +26,10 @@ class Room extends Common
 
     public function connecting(): void
     {
-        $answer = $this->service->connecting($this->user, (int) $_POST['room_id']);
+        $data = $this->service->connecting($this->user, (int) $_GET['id']);
+        $this->appendTplData($data);
 
-        $this->tplData = $answer;
+        $this->display('room.tpl');
     }
 
     public function update(): void

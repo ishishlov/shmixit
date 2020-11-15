@@ -14,9 +14,9 @@ class Common
 
 	public function __construct()
     {
-//        setcookie('user_id', 1, time() + 3600);
         $userId = (new Auth())->getUserId();
         $this->user = (new User())->get($userId);
+        $this->tplData['currentUser'] = $this->user;
     }
 
     public function display($template) {
@@ -29,6 +29,11 @@ class Common
 		print(json_encode($data));
 		exit;
 	}
+
+	protected function appendTplData(array $data): void
+    {
+        $this->tplData[] = $data;
+    }
 
 	/**
 	 * Привести вложенность массива к числу
@@ -52,4 +57,9 @@ class Common
 		var_dump($data);
 		echo '</pre>';
 	}
+
+	public function isAjax(): bool
+    {
+        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+    }
 }

@@ -5,6 +5,7 @@ namespace Domain;
 class GameRound
 {
     private $gameRoundId;
+    private $round;
     private $game;
     private $dateStart;
     private $dateOfWordSelection;

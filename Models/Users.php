@@ -12,9 +12,7 @@ class Users extends Main {
 
     public function __construct()
     {
-        $this->tableName = self::TABLE_NAME;
-        $this->idFieldName = self::ID_FIELD_NAME;
-        parent::__construct();
+        parent::__construct(self::TABLE_NAME, self::ID_FIELD_NAME);
     }
 
     public function getByIds(array $ids): array
@@ -46,5 +44,25 @@ class Users extends Main {
         $stmt = $this->_db->prepare('DELETE FROM ' . self::TABLE_NAME. ' WHERE `user_id` = ?');
 
         return $stmt->execute([$id]);
+    }
+
+    public function save(User $user): void
+    {
+        $stmt = $this->_db->prepare(
+            'INSERT INTO ' . self::TABLE_NAME . ' (name, avatar) VALUES (?, ?)'
+        );
+
+        $stmt->execute([$user->getName(), $user->getAvatar()]);
+        $user->setUserId((int) $this->_db->lastInsertId());
+    }
+
+    public function isNameExist(string $name): bool
+    {
+        $sth = $this->_db->prepare(
+            'SELECT * FROM ' . self::TABLE_NAME . ' WHERE name = ?'
+        );
+        $sth->execute([$name]);
+
+        return (bool) $sth->rowCount();
     }
 }

@@ -3,7 +3,6 @@
 namespace Models;
 
 use Domain\User;
-use PDO;
 
 class RoomUsers extends Main {
 
@@ -12,9 +11,7 @@ class RoomUsers extends Main {
 
     public function __construct()
     {
-        $this->tableName = self::TABLE_NAME;
-        $this->idFieldName = self::ID_FIELD_NAME;
-        parent::__construct();
+        parent::__construct(self::TABLE_NAME, self::ID_FIELD_NAME);
     }
 
     public function save(User $user, int $roomId): bool

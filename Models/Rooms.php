@@ -12,9 +12,7 @@ class Rooms extends Main {
 
     public function __construct()
     {
-        $this->tableName = self::TABLE_NAME;
-        $this->idFieldName = self::ID_FIELD_NAME;
-        parent::__construct();
+        parent::__construct(self::TABLE_NAME, self::ID_FIELD_NAME);
     }
 
     public function save(Domain $room): Domain

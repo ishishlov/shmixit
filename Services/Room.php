@@ -2,6 +2,7 @@
 
 namespace Services;
 
+use Domain\ScorePlayers;
 use Models\RoomUsers;
 use Models\Rooms as Model;
 use Domain\Room as Domain;
@@ -52,8 +53,9 @@ class Room
         }
 
         $roomName = htmlentities(trim($roomName));
+        $dateCreate = date('Y-m-d H:i:s');
         if (!$roomName) {
-            return $this->getAnswerForCreate('Необходимо задать название для игры');
+            $roomName = (string) $dateCreate;
         }
 
         try {
@@ -63,7 +65,7 @@ class Room
                 $roomName,
                 $user,
                 RoomStatuses::getName(RoomStatuses::getCreateStatus()),
-                date('Y-m-d H:i:s')
+                $dateCreate
             );
             $savedRoom = $this->roomModel->save($room);
             if ($savedRoom->getRoomId()) {
@@ -76,7 +78,7 @@ class Room
         }
     }
 
-    public function connecting(User $user, ?int $roomId): array
+    public function connecting(User $user, int $roomId): array
     {
         if (!$roomId) {
             return $this->getAnswerForConnecting('Ошибка входа в игру. Не удалось подключиться');
@@ -97,7 +99,7 @@ class Room
             $roomUsers->addUser($user);
         }
 
-        return $this->getAnswerForConnecting('', $roomUsers->getCount(), $roomUsers->getMessages());
+        return $this->getAnswerForConnecting('', $roomUsers->getCount(), $roomUsers->getUsers());
     }
 
     public function update(User $user, ?int $roomId): array
@@ -106,7 +108,7 @@ class Room
         $room = $this->getRoom($roomId);
         $startGame = RoomStatuses::isActive($room->getStatus());
 
-        return $this->getAnswerForConnecting('', $roomUsers->getCount(), $roomUsers->getMessages(), $startGame);
+        return $this->getAnswerForConnecting('', $roomUsers->getCount(), $roomUsers->getUsers(), $startGame);
     }
 
     public function start(User $user, ?int $roomId): array
@@ -194,10 +196,8 @@ class Room
         $room->setStatus(RoomStatuses::getActiveStatus());
         $savedRoom = $this->roomModel->save($room);
 
-        $game = $this->gameService->create($savedRoom);
         $roomUsers = $this->getRoomUsers($room->getRoomId());
-        $playersCards = $this->cardService->generatePlayersCards($roomUsers->getUserIds());
-        $this->gameService->start($game, $playersCards);
+        $game = $this->gameService->create($savedRoom, $roomUsers);
 
         //ToDo доделать логику
         return $game->getGameId();
@@ -211,12 +211,12 @@ class Room
         ];
     }
 
-    private function getAnswerForConnecting(string $error, ?int $countPlayers = 0, ?array $messages = [], ?bool $startGame = false): array
+    private function getAnswerForConnecting(string $error, ?int $countPlayers = 0, ?array $users = [], ?bool $startGame = false): array
     {
         return [
             'error' => $error,
             'count_players' => $countPlayers,
-            'messages' => $messages,
+            'users' => $users,
             'start_game' => $startGame
         ];
     }
