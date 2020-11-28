@@ -39,6 +39,13 @@ class Room extends Common
         $this->toJson($answer);
     }
 
+    public function leave()
+    {
+        $answer = $this->service->leave($this->user, (int) $_POST['user_id'], (int) $_POST['room_id']);
+
+        $this->toJson($answer);
+    }
+
     public function start(): void
     {
         $answer = $this->service->start($this->user, (int) $_POST['room_id']);

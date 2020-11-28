@@ -41,7 +41,7 @@ class RoomUsers
     public function userInRoom(User $user): bool
     {
         foreach ($this->users as $userInRoom) {
-            if ($userInRoom->isEqual($user)) {
+            if ($userInRoom->isEqual($user->getUserId())) {
                 return true;
             }
         }

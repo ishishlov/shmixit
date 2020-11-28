@@ -53,9 +53,8 @@ class Room
         }
 
         $roomName = htmlentities(trim($roomName));
-        $dateCreate = date('Y-m-d H:i:s');
         if (!$roomName) {
-            $roomName = (string) $dateCreate;
+            $roomName = 'Без названия';
         }
 
         try {
@@ -65,7 +64,7 @@ class Room
                 $roomName,
                 $user,
                 RoomStatuses::getName(RoomStatuses::getCreateStatus()),
-                $dateCreate
+                date('Y-m-d H:i:s')
             );
             $savedRoom = $this->roomModel->save($room);
             if ($savedRoom->getRoomId()) {
@@ -111,10 +110,22 @@ class Room
         return $this->getAnswerForConnecting('', $roomUsers->getCount(), $roomUsers->getUsers(), $startGame);
     }
 
+    public function leave(User $user, int $userId, int $roomId): array
+    {
+        $room = $this->getRoom($roomId);
+        if (!$user->isEqual($userId) && !$room->isAdmin($userId)) {
+            return $this->getAnswerForLeave('Ошибка доступа');
+        }
+
+        $this->roomUsersModel->delete($userId, $roomId);
+
+        return $this->getAnswerForLeave();
+    }
+
     public function start(User $user, ?int $roomId): array
     {
         $room = $this->getRoom($roomId);
-        if (!$room->isAdmin($user)) {
+        if (!$room->isAdmin($user->getUserId())) {
             return $this->getAnswerForStart('Лишь избранный наделен властью запускать игру. Зовите создателя');
         }
 
@@ -226,6 +237,13 @@ class Room
         return [
             'error' => $error,
             'game_id' => $gameId
+        ];
+    }
+
+    private function getAnswerForLeave(?string $error = ''): array
+    {
+        return [
+            'error' => $error
         ];
     }
 }

@@ -85,8 +85,8 @@ class Room
         return $this->dateCreate;
     }
 
-    public function isAdmin(User $user): bool
+    public function isAdmin(int $userId): bool
     {
-        return $user->getUserId() === $this->adminUser->getUserId();
+        return $userId === $this->adminUser->getUserId();
     }
 }

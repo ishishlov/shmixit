@@ -57,9 +57,9 @@ class User
         return !(bool) $this->userId;
     }
 
-    public function isEqual(User $user): bool
+    public function isEqual(int $userId): bool
     {
-        return $user->getUserId() === $this->userId;
+        return $userId === $this->userId;
     }
 
     public function cutDangerousCharacters(): void

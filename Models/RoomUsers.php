@@ -22,4 +22,13 @@ class RoomUsers extends Main {
 
         return $stmt->execute([$roomId, $user->getUserId()]);
     }
+
+    public function delete(int $userId, int $roomId): bool
+    {
+        $stmt = $this->_db->prepare(
+            'DELETE FROM ' . self::TABLE_NAME . ' WHERE user_id = ? AND room_id = ?'
+        );
+
+        return $stmt->execute([$userId, $roomId]);
+    }
 }

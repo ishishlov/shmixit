@@ -22,7 +22,6 @@
 				<img src="{{ roomUser.avatar }}">
 				{{ roomUser.name }}
 			</td>
-			<td>{{ roomUser.adminUser.name }}</td>
 			<td>
 				{% if roomUser.getUserId() == currentUser.getUserId() %}
 					<button type="submit" class="btn btn-outline-dark">Выйти</button>
@@ -33,4 +32,7 @@
 		</tbody>
 	</table>
 {% endif %}
+
+<a href="/">На главную</a>
+
 {% include('footer.tpl') %}

@@ -32,7 +32,7 @@ class Common
 
 	protected function appendTplData(array $data): void
     {
-        $this->tplData[] = $data;
+        $this->tplData = array_merge($this->tplData, $data);
     }
 
 	/**

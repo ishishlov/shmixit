@@ -55,10 +55,10 @@
 					<td>{{ room.statusName }}</td>
 					<td>
 						{% if room.status == 1 and not user.isGuest %}
-							<button type="submit" class="btn btn-outline-dark">Войти</button>
+							<a href="room/connecting?id={{ room.roomId }}" class="btn btn-outline-dark">Войти</a>
 						{% endif %}
 						{% if room.status == 2 or room.status == 3 %}
-							<button type="submit" class="btn btn-outline-dark">Просмотр</button>
+							<a href="room/connecting?id={{ room.roomId }}" class="btn btn-outline-dark">Просмотр</a>
 						{% endif %}
 					</td>
 				</tr>
