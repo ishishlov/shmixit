@@ -8,19 +8,19 @@ class RoomUsers
     private $users;
 
     /**
-     * @param int|null $roomId
-     * @param User[]|null $users
+     * @param int $roomId
+     * @param Users $users
      */
-    public function __construct(?int $roomId = null, ?array $users = [])
+    public function __construct(int $roomId, Users $users)
     {
         $this->roomId = $roomId;
         $this->users = $users;
     }
 
     /**
-     * @return int|null
+     * @return int
      */
-    public function getRoomId(): ?int
+    public function getRoomId(): int
     {
         return $this->roomId;
     }
@@ -28,36 +28,25 @@ class RoomUsers
     /**
      * @return User[]|null
      */
-    public function getUsers(): ?array
+    public function getUsersRenderData(): ?array
     {
-        return $this->users;
+        return $this->users->getRenderData();
     }
 
     public function addUser(User $user): void
     {
-        $this->users[] = $user;
+        $this->users->add($user);
     }
 
     public function userInRoom(User $user): bool
     {
-        foreach ($this->users as $userInRoom) {
-            if ($userInRoom->isEqual($user->getUserId())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function getCount(): int
-    {
-        return count($this->users);
+        return $this->users->isExists($user);
     }
 
     public function getMessages(): array
     {
         $messages = [];
-        foreach ($this->users as $user) {
+        foreach ($this->users->toArray() as $user) {
             $messages[] = sprintf('%s присоединился к игре', $user->getName());
         }
 
@@ -66,11 +55,6 @@ class RoomUsers
 
     public function getUserIds(): array
     {
-        return array_map(
-            static function(User $user) {
-                return $user->getUserId();
-            },
-            $this->users
-        );
+        return $this->users->getUserIds();
     }
 }

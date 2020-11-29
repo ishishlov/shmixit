@@ -4,21 +4,21 @@ namespace Domain;
 
 class Room
 {
-    private $roomId;
     private $status;
     private $name;
     private $adminUser;
     private $statusName;
     private $dateCreate;
+    private $roomId;
 
-    public function __construct(?int $roomId = null, ?int $status = null, ?string $name = null, ?User $adminUser = null, ?string $statusName = '', ?string $dateCreate = '')
+    public function __construct(int $status, string $name, User $adminUser, string $statusName, ?string $dateCreate = '', ?int $roomId = null)
     {
-        $this->roomId = $roomId;
         $this->status = $status;
         $this->name = $name;
         $this->adminUser = $adminUser;
         $this->statusName = $statusName;
         $this->dateCreate = $dateCreate;
+        $this->roomId = $roomId;
     }
 
     /**

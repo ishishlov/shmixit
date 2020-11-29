@@ -6,19 +6,29 @@
 
         let _module;
         let $_mainContainer;
+        let roomId = 0;
+        let userIdsList = '';
 
         const MAX_LENGTH_ROOM_NAME = 20;
-        const AJAX_URL_CREATE_ROOM = 'room/create';
+        const AJAX_URL_CREATE_ROOM = '/room/create';
+        const AJAX_URL_UPDATE_ROOM = '/room/update';
         const AJAX_URL_CONNECTING_PLAYERS = '/room/connecting?id=';
+        const AJAX_URL_START_GAME = '/game/play';
+        const TIME_UPDATE_IN_SEC = 10;
 
         return {
             init: function() {
                 _module = this;
+                _module.setRoomData();
                 $_mainContainer = $('#main-content');
 
                 let error = $('#page-error').data('page-error');
                 if (error) {
                     $('#pageErrorModal').modal('show');
+                }
+
+                if (roomId) {
+                    _module.startUpdatingRoom();
                 }
 
                 $('body').on('click', '.closePageErrorModal', function (e) {
@@ -49,6 +59,118 @@
                         $('#saveRoom').click();
                     }
                 });
+            },
+
+            setRoomData: function () {
+                const roomData = $('#roomData');
+                roomId = roomData.data('room-id');
+                userIdsList = roomData.data('user-ids-list');
+            },
+
+            startUpdatingRoom: function () {
+                const ajaxParams = {
+                    room_id: roomId
+                };
+                const callback = function(response) {
+                    if (response.error) {
+                        console.log(response.error);
+                        return;
+                    }
+
+                    if (response.start_game) {
+                        window.location.href = AJAX_URL_START_GAME;
+                        return;
+                    }
+
+                    if (response.user_ids_list !== userIdsList) {
+                        let lostAndNewUserIds = _module.getLostAndNewUserIds(response.user_ids_list);
+                        userIdsList = response.user_ids_list;
+
+                        if (lostAndNewUserIds.lostIds.length) {
+                            _module.deleteExitedUsers(lostAndNewUserIds.lostIds);
+                            _module.recalculateIndex();
+                        }
+
+                        if (lostAndNewUserIds.newIds.length) {
+                            _module.renderConnectedUsers(lostAndNewUserIds.newIds, response.users);
+                        }
+
+                    }
+                };
+
+                setInterval(function() {
+                        _module.ajaxSend(AJAX_URL_UPDATE_ROOM, ajaxParams, callback);
+                    },
+                    TIME_UPDATE_IN_SEC * 1000
+                );
+            },
+
+            getLostAndNewUserIds: function (newUserIdsList) {
+                let oldUserIds = userIdsList.split(',');
+                let newUserIds = newUserIdsList.split(',');
+
+                return {
+                    lostIds: _module.getIdsDiff(oldUserIds, newUserIds),
+                    newIds: _module.getIdsDiff(newUserIds, oldUserIds)
+                };
+            },
+
+            getIdsDiff: function (mainIdsList, newIdsList) {
+                let ids = [];
+                $(mainIdsList).each(function(index, id) {
+                    if ($.inArray(id, newIdsList) === -1) {
+                        ids.push(id);
+                    }
+                });
+
+                return ids;
+            },
+
+            deleteExitedUsers: function (userIds) {
+                $(userIds).each(function(index, id) {
+                    $('#user-table-row-' + id).hide(500); //animation
+                });
+
+                setTimeout(() => {
+                    $(userIds).each(function(index, id) {
+                        $('#user-table-row-' + id).remove();
+                    });
+                }, 600);
+            },
+
+            renderConnectedUsers: function (newUserIds, users) {
+                const userIds = userIdsList.split(',');
+                let i = userIds.length - newUserIds.length;
+                $(newUserIds).each(function(index, id) {
+                    i++;
+                    _module.renderUserInTable(i, users[id]);
+                });
+            },
+
+            recalculateIndex: function () {
+                const userIds = userIdsList.split(',');
+                let newIndex = 1;
+                $(userIds).each(function(index, id) {
+                    $('#index-user-id-' + id).text(newIndex);
+                    newIndex++;
+                });
+            },
+
+            renderUserInTable: function (index, user) {
+                let row = (
+                    '<tr id="user-table-row-' + user.id + '" style="display: none;">' +
+                        '<td id="index-user-id-' + user.id + '">' + index + '</td>' +
+                        '<td>' +
+                            '<img src="' + user.avatar + '">' +
+                            user.name +
+                        '</td>' +
+                        '<td>' +
+                        '</td>' +
+                    '</tr>'
+                );
+                $('.user-table-body').append(row);
+                $('#user-table-row-' + user.id).show(800);
+
             },
 
             validateName: function (name) {

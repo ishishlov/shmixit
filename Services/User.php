@@ -2,6 +2,7 @@
 
 namespace Services;
 
+use Domain\Users;
 use Exception;
 use Models\Users as Model;
 use Domain\User as Domain;
@@ -35,26 +36,28 @@ class User
 
     /**
      * @param array|null $userIds
-     * @return Domain[]
+     * @return Users
      */
-    public function getByIds(?array $userIds): array
+    public function getByIds(?array $userIds): Users
     {
         if(!$userIds) {
-            return [];
+            return Users::createEmpty();
         }
-        $users = $this->model->getByIds($userIds);
+        $usersDb = $this->model->getByIds($userIds);
+        $users = $this->map($usersDb);
 
-        return $this->map($users);
+        return Users::create($users);
     }
 
     /**
-     * @return Domain[]
+     * @return Users
      */
-    public function getAll(): array
+    public function getAll(): Users
     {
-        $users = $this->model->getAll();
+        $usersDb = $this->model->getAll();
+        $users = $this->map($usersDb);
 
-        return $this->map($users);
+        return Users::create($users);
     }
 
     public function save($name): array

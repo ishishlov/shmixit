@@ -11,7 +11,7 @@ class Shmixit extends Common
 
 	    $this->tplData['user'] = $this->user;
 	    $this->tplData['rooms'] = (new Services\Room())->getAllRooms();
-	    $this->tplData['users'] = $userService->getAll();
+	    $this->tplData['users'] = $userService->getAll()->toArray();
         $this->display('index.tpl');
 	}
 }

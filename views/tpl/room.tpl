@@ -14,16 +14,16 @@
 			<th>Действие</th>
 		</tr>
 		</thead>
-		<tbody>
+		<tbody class="user-table-body">
 		{% for roomUser in users %}
-		<tr>
-			<td>{{ loop.index }}</td>
+		<tr id="user-table-row-{{ roomUser.id }}">
+			<td id="index-user-id-{{ roomUser.id }}">{{ loop.index }}</td>
 			<td>
 				<img src="{{ roomUser.avatar }}">
 				{{ roomUser.name }}
 			</td>
 			<td>
-				{% if roomUser.getUserId() == currentUser.getUserId() %}
+				{% if roomUser.id == currentUser.getUserId() %}
 					<button type="submit" class="btn btn-outline-dark">Выйти</button>
 				{% endif %}
 			</td>
@@ -34,5 +34,9 @@
 {% endif %}
 
 <a href="/">На главную</a>
-
+<div id="roomData"
+	 data-room-id="{{ room_id }}"
+	 data-user-ids-list="{{ user_ids_list }}"
+ >
+ </div>
 {% include('footer.tpl') %}

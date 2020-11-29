@@ -59,7 +59,6 @@ class Room
 
         try {
             $room = new Domain(
-                null,
                 RoomStatuses::getCreateStatus(),
                 $roomName,
                 $user,
@@ -98,16 +97,16 @@ class Room
             $roomUsers->addUser($user);
         }
 
-        return $this->getAnswerForConnecting('', $roomUsers->getCount(), $roomUsers->getUsers());
+        return $this->getAnswerForConnecting('', $roomId, $roomUsers);
     }
 
-    public function update(User $user, ?int $roomId): array
+    public function update(User $user, int $roomId): array
     {
         $roomUsers = $this->getRoomUsers($roomId);
         $room = $this->getRoom($roomId);
         $startGame = RoomStatuses::isActive($room->getStatus());
 
-        return $this->getAnswerForConnecting('', $roomUsers->getCount(), $roomUsers->getUsers(), $startGame);
+        return $this->getAnswerForConnecting('', $roomId, $roomUsers, $startGame);
     }
 
     public function leave(User $user, int $userId, int $roomId): array
@@ -145,7 +144,7 @@ class Room
 
         foreach ($rooms as &$room) {
             $room['status_name'] = RoomStatuses::getName($room['status']);
-            foreach ($users as $user) {
+            foreach ($users->toArray() as $user) {
                 if ($user->getUserId() === (int) $room['admin_user_id']) {
                     $room['admin_user'] = $user;
                     break;
@@ -169,12 +168,12 @@ class Room
         $users = [];
         foreach ($data as $room) {
             $users[] = new Domain(
-                $room['room_id'],
                 $room['status'],
                 $room['name'],
                 $room['admin_user'],
                 $room['status_name'],
-                $room['date_create']
+                $room['date_create'],
+                $room['room_id']
             );
         }
 
@@ -222,12 +221,13 @@ class Room
         ];
     }
 
-    private function getAnswerForConnecting(string $error, ?int $countPlayers = 0, ?array $users = [], ?bool $startGame = false): array
+    private function getAnswerForConnecting(string $error, ?int $roomId = null, ?RoomUsersDomain $roomUsers = null, ?bool $startGame = false): array
     {
         return [
             'error' => $error,
-            'count_players' => $countPlayers,
-            'users' => $users,
+            'room_id' => $roomId,
+            'users' => $roomUsers ? $roomUsers->getUsersRenderData() : null,
+            'user_ids_list' => $roomUsers ? implode(',', $roomUsers->getUserIds()) : null,
             'start_game' => $startGame
         ];
     }
