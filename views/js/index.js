@@ -41,17 +41,6 @@
                 }
 
                 return '';
-            },
-
-            ajaxSend: function (url, ajaxParams, callback) {
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: ajaxParams,
-                    dataType: 'json'
-                }).done(function(response) {
-                    callback(response);
-                });
             }
         };
     })(jQuery);

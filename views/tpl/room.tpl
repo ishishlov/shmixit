@@ -6,7 +6,7 @@
 {% if users is empty %}
 	<h3>Пока никто не присоединился к игре</h3>
 {% else %}
-	<table class="table table-striped">
+	<table id="roomTable" class="table table-striped">
 		<thead>
 		<tr>
 			<th>№</th>
@@ -24,7 +24,7 @@
 			</td>
 			<td>
 				{% if roomUser.id == currentUser.getUserId() %}
-					<button type="submit" class="btn btn-outline-dark">Выйти</button>
+					<button id="leaveRoom" type="submit" class="btn btn-outline-dark" data-user-id="{{ roomUser.id }}">Выйти</button>
 				{% endif %}
 			</td>
 		</tr>

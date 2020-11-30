@@ -117,8 +117,9 @@ class Room
         }
 
         $this->roomUsersModel->delete($userId, $roomId);
+        $needRedirect = $user->isEqual($userId);
 
-        return $this->getAnswerForLeave();
+        return $this->getAnswerForLeave('', $needRedirect);
     }
 
     public function start(User $user, ?int $roomId): array
@@ -240,10 +241,11 @@ class Room
         ];
     }
 
-    private function getAnswerForLeave(?string $error = ''): array
+    private function getAnswerForLeave(?string $error = '', ?bool $needRedirect = true): array
     {
         return [
-            'error' => $error
+            'error' => $error,
+            'need_redirect' => $error ? false : $needRedirect
         ];
     }
 }

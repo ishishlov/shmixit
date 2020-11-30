@@ -6,12 +6,14 @@
 
         let _module;
         let $_mainContainer;
+        let $_roomTable;
         let roomId = 0;
         let userIdsList = '';
 
         const MAX_LENGTH_ROOM_NAME = 20;
         const AJAX_URL_CREATE_ROOM = '/room/create';
         const AJAX_URL_UPDATE_ROOM = '/room/update';
+        const AJAX_URL_LEAVE_ROOM = '/room/leave';
         const AJAX_URL_CONNECTING_PLAYERS = '/room/connecting?id=';
         const AJAX_URL_START_GAME = '/game/play';
         const TIME_UPDATE_IN_SEC = 10;
@@ -21,6 +23,7 @@
                 _module = this;
                 _module.setRoomData();
                 $_mainContainer = $('#main-content');
+                $_roomTable = $('#roomTable');
 
                 let error = $('#page-error').data('page-error');
                 if (error) {
@@ -45,12 +48,16 @@
                         $('#room-name-error').append(error);
                         return;
                     }
-
-                    $(e.target)
-                        .attr('disabled', true)
-                        .html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Ждемс...');
+                    showButtonLoader($(e.target));
 
                     _module.createRoom(name);
+                });
+
+                $_roomTable.on('click', '#leaveRoom', function (e) {
+                    let userId = $(e.target).data('user-id');
+                    showButtonLoader($(e.target));
+
+                    _module.leaveRoom(userId);
                 });
 
                 $_mainContainer.keypress(function(e) {
@@ -68,9 +75,7 @@
             },
 
             startUpdatingRoom: function () {
-                const ajaxParams = {
-                    room_id: roomId
-                };
+                const ajaxParams = {room_id: roomId};
                 const callback = function(response) {
                     if (response.error) {
                         console.log(response.error);
@@ -99,7 +104,7 @@
                 };
 
                 setInterval(function() {
-                        _module.ajaxSend(AJAX_URL_UPDATE_ROOM, ajaxParams, callback);
+                        ajaxSend(AJAX_URL_UPDATE_ROOM, ajaxParams, callback);
                     },
                     TIME_UPDATE_IN_SEC * 1000
                 );
@@ -186,25 +191,32 @@
                 let callback = function (response) {
                     if (response.error) {
                         $('#room-name-error').append(response.error);
-                        $('#saveRoom')
-                            .attr('disabled', false)
-                            .html('Сохранить');
+                        hideButtonLoader($('#saveRoom'), 'Сохранить');
                     } else {
                         window.location.href = AJAX_URL_CONNECTING_PLAYERS + response.room_id;
                     }
                 };
-                _module.ajaxSend(AJAX_URL_CREATE_ROOM, ajaxParams, callback);
+                ajaxSend(AJAX_URL_CREATE_ROOM, ajaxParams, callback);
             },
 
-            ajaxSend: function (url, ajaxParams, callback) {
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: ajaxParams,
-                    dataType: 'json'
-                }).done(function(response) {
-                    callback(response);
-                });
+            leaveRoom: function (userId) {
+                let ajaxParams = {
+                    user_id: userId,
+                    room_id: roomId
+                };
+                let callback = function (response) {
+                    if (response.error) {
+                        console.log(response.error);
+                    }
+
+                    if (response.need_redirect) {
+                        window.location.href = '/';
+                        return;
+                    }
+
+                    hideButtonLoader($('#leaveRoom'), 'Выйти');
+                };
+                ajaxSend(AJAX_URL_LEAVE_ROOM, ajaxParams, callback);
             }
         };
     })(jQuery);

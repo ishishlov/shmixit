@@ -27,10 +27,7 @@
                         $('#user-name-error').append(error);
                         return;
                     }
-
-                    $(e.target)
-                        .attr('disabled', true)
-                        .html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Ждемс...');
+                    showButtonLoader($(e.target));
 
                     _module.saveName(name);
                 });
@@ -49,7 +46,7 @@
                         location.reload();
                     };
 
-                    _module.ajaxSend(AJAX_URL_LOGIN, ajaxParams, callback);
+                    ajaxSend(AJAX_URL_LOGIN, ajaxParams, callback);
                 });
 
                 $_mainContainer.on('click', '#logout', function (e) {
@@ -58,11 +55,8 @@
                     let callback = function () {
                         location.reload();
                     };
-                    $(e.target)
-                        .attr('disabled', true)
-                        .html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Ждемс...');
-
-                    _module.ajaxSend(AJAX_URL_LOGOUT, ajaxParams, callback);
+                    showButtonLoader($(e.target));
+                    ajaxSend(AJAX_URL_LOGOUT, ajaxParams, callback);
                 });
 
             },
@@ -84,25 +78,12 @@
                 let callback = function (response) {
                     if (response.error) {
                         $('#user-name-error').append(response.error);
-                        $('#saveUser')
-                            .attr('disabled', false)
-                            .html('Сохранить');
+                        hideButtonLoader($('#saveUser'), 'Сохранить');
                     } else {
                         location.reload();
                     }
                 };
-                _module.ajaxSend(AJAX_URL_SAVE_NAME, ajaxParams, callback);
-            },
-
-            ajaxSend: function (url, ajaxParams, callback) {
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: ajaxParams,
-                    dataType: 'json'
-                }).done(function(response) {
-                    callback(response);
-                });
+                ajaxSend(AJAX_URL_SAVE_NAME, ajaxParams, callback);
             }
         };
     })(jQuery);
