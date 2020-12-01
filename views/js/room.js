@@ -15,8 +15,10 @@
         const AJAX_URL_UPDATE_ROOM = '/room/update';
         const AJAX_URL_LEAVE_ROOM = '/room/leave';
         const AJAX_URL_CONNECTING_PLAYERS = '/room/connecting?id=';
-        const AJAX_URL_START_GAME = '/game/play';
+        const AJAX_URL_START_GAME = '/room/gameStart';
+        const AJAX_URL_PLAY_GAME = '/game/play?id=';
         const TIME_UPDATE_IN_SEC = 10;
+        const MIN_PLAYERS_FOR_START_GAME = 3;
 
         return {
             init: function() {
@@ -25,18 +27,15 @@
                 $_mainContainer = $('#main-content');
                 $_roomTable = $('#roomTable');
 
-                let error = $('#page-error').data('page-error');
+                let error = $('#page-error-text').data('show-error');
                 if (error) {
-                    $('#pageErrorModal').modal('show');
+                    showError();
                 }
 
                 if (roomId) {
                     _module.startUpdatingRoom();
+                    _module.availableStartGame();
                 }
-
-                $('body').on('click', '.closePageErrorModal', function (e) {
-                    window.location.href = '/';
-                });
 
                 $_mainContainer.on('click', '#saveRoom', function (e) {
                     $('#room-name-error').empty();
@@ -65,6 +64,11 @@
                         e.preventDefault();
                         $('#saveRoom').click();
                     }
+                });
+
+                $('#startGame').on('click', function (e) {
+                    showButtonLoader($(e.target));
+                    _module.startGame();
                 });
             },
 
@@ -100,6 +104,7 @@
                             _module.renderConnectedUsers(lostAndNewUserIds.newIds, response.users);
                         }
 
+                        _module.availableStartGame();
                     }
                 };
 
@@ -217,6 +222,32 @@
                     hideButtonLoader($('#leaveRoom'), 'Выйти');
                 };
                 ajaxSend(AJAX_URL_LEAVE_ROOM, ajaxParams, callback);
+            },
+
+            availableStartGame: function () {
+                let startGameButton = $('#startGame');
+                let countPlayers = userIdsList.split(',').length;
+
+                if (countPlayers >= MIN_PLAYERS_FOR_START_GAME) {
+                    startGameButton.attr('disabled', false);
+                } else {
+                    startGameButton.attr('disabled', true);
+                }
+            },
+
+            startGame: function () {
+                let ajaxParams = {room_id: roomId};
+                let callback = function (response) {
+                    if (response.error) {
+                        console.log(response.error);
+                        showError(response.error);
+                        hideButtonLoader($('#startGame'), 'Старт игры');
+                    } else {
+                        console.log('redirect to ' + AJAX_URL_PLAY_GAME + response.game_id);
+                        // window.location.href = AJAX_URL_PLAY_GAME + response.game_id;
+                    }
+                };
+                ajaxSend(AJAX_URL_START_GAME, ajaxParams, callback);
             }
         };
     })(jQuery);

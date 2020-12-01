@@ -16,5 +16,15 @@ function showButtonLoader(object) {
 }
 
 function hideButtonLoader(object, buttonText) {
+    $(object)
+        .attr('disabled', false)
+        .html(buttonText);
+}
 
+function showError(errorText) {
+    if (errorText) {
+        $('#page-error-text').html('<p>' + errorText + '</p>');
+    }
+
+    $('#pageErrorModal').modal('show');
 }

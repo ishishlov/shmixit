@@ -46,9 +46,9 @@ class Room extends Common
         $this->toJson($answer);
     }
 
-    public function start(): void
+    public function gameStart(): void
     {
-        $answer = $this->service->start($this->user, (int) $_POST['room_id']);
+        $answer = $this->service->gameStart($this->user, (int) $_POST['room_id']);
 
         $this->toJson($answer);
     }

@@ -122,7 +122,7 @@ class Room
         return $this->getAnswerForLeave('', $needRedirect);
     }
 
-    public function start(User $user, ?int $roomId): array
+    public function gameStart(User $user, ?int $roomId): array
     {
         $room = $this->getRoom($roomId);
         if (!$room->isAdmin($user->getUserId())) {
@@ -204,6 +204,7 @@ class Room
 
     private function startGame(Domain $room): int
     {
+        return 1; //ToDo для дебага
         $room->setStatus(RoomStatuses::getActiveStatus());
         $savedRoom = $this->roomModel->save($room);
 

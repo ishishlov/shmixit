@@ -34,6 +34,9 @@
 {% endif %}
 
 <a href="/">На главную</a>
+
+<button id="startGame" disabled type="submit" class="btn btn-success btn-lg btn-block">Старт игры</button>
+
 <div id="roomData"
 	 data-room-id="{{ room_id }}"
 	 data-user-ids-list="{{ user_ids_list }}"

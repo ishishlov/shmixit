@@ -11,7 +11,7 @@ class Game extends Common
     public function __construct()
     {
         parent::__construct();
-        $this->gameService = new GameService($this->user);
+        $this->gameService = new GameService();
     }
 
     public function play(): void
