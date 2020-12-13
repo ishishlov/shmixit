@@ -34,6 +34,17 @@ class CardPlayers
         return new self($cardPlayers);
     }
 
+    public function getByUserId(int $userId): CardPlayer
+    {
+        foreach ($this->cardPlayers as $playerCards) {
+            if ($playerCards->isUserCards($userId)) {
+                return $playerCards;
+            }
+        }
+
+        return 'ERROR';// ToDo need to refactoring
+    }
+
     public function suspendExtraCards(): void
     {
         foreach ($this->cardPlayers as $cardPlayer) {

@@ -4,8 +4,10 @@ namespace Services;
 
 use Domain\GameStatuses;
 use Domain\RoomUsers;
+use Domain\RoundPlayers;
 use Domain\ScorePlayers;
 use Domain\Word;
+use Models\GameRoundPlayers;
 use Models\GameRounds;
 use Models\Games as Model;
 use Domain\Game as Domain;
@@ -27,6 +29,7 @@ class Game
     {
         $this->gameModel = new Model();
         $this->roundModel = new GameRounds();
+        $this->roundPlayerModel = new GameRoundPlayers();
         $this->cardService = new CardService();
     }
 
@@ -35,10 +38,12 @@ class Game
         $date = date('Y-m-d H:i:s');
         $game = new Domain(null, $room, GameStatuses::getActiveStatus(), $date);
         $this->gameModel->save($game);
+        $this->roundModel->save($game);
 
         $cardPlayers = $this->cardService->generatePlayersCards($roomUsers->getUserIds());
         $scorePlayers = ScorePlayers::createForStart($roomUsers->getUserIds());
-        $this->roundModel->save($game, $cardPlayers, $scorePlayers);
+        $roundPlayers = RoundPlayers::createFromCardsAndScores($game, $roomUsers, $cardPlayers, $scorePlayers);
+        $this->roundPlayerModel->create($roundPlayers);
 
         return $game;
     }

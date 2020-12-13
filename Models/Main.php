@@ -37,11 +37,15 @@ class Main {
 	/**
 	 * Метод для мультиинсерта
 	 * 
-	 * @param string Название таблицы
 	 * @param array Массив вставляемых данных, где ключ - название стоблца, значение - значение столбца
+	 * @param string Название таблицы
 	 * @return bool
 	 */
-	public function insert($tableName, $data) {
+	public function insert($data, $tableName = '') {
+	    if (!$tableName) {
+            $tableName = $this->tableName;
+        }
+
 		$prepareData = $this->_prepareDataForInsert($data);
 		$stmt = $this->_db->prepare('INSERT INTO ' . $tableName . ' (' . $prepareData['titles'] . ') VALUES ' . $prepareData['values']);
 

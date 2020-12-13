@@ -8,7 +8,5 @@ create table game_rounds
     date_of_word_selection datetime     null,
     date_finish            datetime     null,
     word                   varchar(150) null,
-    status                 smallint     not null,
-    card_players           text         null,
-    score_players          text         null
+    status                 smallint     not null
 );

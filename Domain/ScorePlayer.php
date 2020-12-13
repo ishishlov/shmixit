@@ -37,4 +37,14 @@ class ScorePlayer
     {
         return new self($playerId, $score);
     }
+
+    public function isUserScores(int $userId): bool
+    {
+        return $this->playerId === $userId;
+    }
+
+    public function getScore(): int
+    {
+        return $this->score;
+    }
 }

@@ -49,4 +49,15 @@ class ScorePlayers
 
         return self::create($scorePlayers);
     }
+
+    public function getByUserId(int $userId): ScorePlayer
+    {
+        foreach ($this->scorePlayers as $playerScores) {
+            if ($playerScores->isUserScores($userId)) {
+                return $playerScores;
+            }
+        }
+
+        return 'ERROR';// ToDo need to refactoring
+    }
 }

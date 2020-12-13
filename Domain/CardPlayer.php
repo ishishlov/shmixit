@@ -50,4 +50,14 @@ class CardPlayer
             $counter++;
         }
     }
+
+    public function isUserCards(int $userId): bool
+    {
+        return $this->playerId === $userId;
+    }
+
+    public function toJson(): string
+    {
+        return json_encode($this->cards);
+    }
 }

@@ -18,12 +18,12 @@ class GameRounds extends Main {
         parent::__construct(self::TABLE_NAME, self::ID_FIELD_NAME);
     }
 
-    public function save(Game $game, CardPlayers $playersCards, ScorePlayers $scorePlayers)
+    public function save(Game $game)
     {
         $stmt = $this->_db->prepare(
             'INSERT INTO ' . self::TABLE_NAME . ' (round, game_id,
-            date_start, date_of_word_selection, date_finish, word, status, card_players, score_players)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            date_start, date_of_word_selection, date_finish, word, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?)'
         );
         $res = $stmt->execute(
             [
@@ -33,15 +33,12 @@ class GameRounds extends Main {
                 null,
                 null,
                 null,
-                $game->getStatus(), // ToDo пересмотреть
-                $playersCards->toJson(),
-                $scorePlayers->toJson()
+                $game->getStatus() // ToDo пересмотреть
             ]
         );
-        $roomId = $res ? $this->_db->lastInsertId() : 0;
-        $room->setRoomId($roomId);
+        $gameRoundId = $res ? $this->_db->lastInsertId() : 0;
 
-        return $room;
+        return $gameRoundId;
     }
 
     public function getRooms(array $statuses): array
