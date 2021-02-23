@@ -2,6 +2,9 @@
 
 require_once __DIR__ . '/Common.php';
 
+use Services\RequestData\RequestData;
+use Services\RequestData\PostData;
+use Services\RequestData\GetData;
 use Services\Room as RoomService;
 
 class Room extends Common
@@ -11,6 +14,8 @@ class Room extends Common
      */
     private $service;
 
+    private const TEMPLATE_NAME = 'room.tpl';
+
     public function __construct()
     {
         parent::__construct();
@@ -19,37 +24,63 @@ class Room extends Common
 
     public function create(): void
     {
-        $answer = $this->service->createRoom($this->user, (string) $_POST['room_name']);
+        $this->ajaxProcessRequest(function () {
+            $answer = $this->service->createRoom(
+                $this->user,
+                PostData::get('room_name')
+            );
 
-        $this->toJson($answer);
+            $this->toJson($answer);
+        });
     }
 
     public function connecting(): void
     {
-        $data = $this->service->connecting($this->user, (int) $_GET['id']);
-        $this->appendTplData($data);
+        $this->processRequest(function () {
+            $data = $this->service->connecting(
+                $this->user,
+                GetData::get('id', RequestData::INT));
+            $this->appendTplData($data);
+        });
 
-        $this->display('room.tpl');
+        $this->display(self::TEMPLATE_NAME);
     }
 
     public function update(): void
     {
-        $answer = $this->service->update($this->user, (int) $_POST['room_id']);
+        $this->ajaxProcessRequest(function () {
+            $answer = $this->service->update(
+                $this->user,
+                PostData::get('room_id', RequestData::INT)
+            );
 
-        $this->toJson($answer);
+            $this->toJson($answer);
+        });
+
     }
 
-    public function leave()
+    public function leave(): void
     {
-        $answer = $this->service->leave($this->user, (int) $_POST['user_id'], (int) $_POST['room_id']);
+        $this->ajaxProcessRequest(function () {
+            $answer = $this->service->leave(
+                $this->user,
+                PostData::get('user_id', RequestData::INT),
+                PostData::get('room_id', RequestData::INT)
+            );
 
-        $this->toJson($answer);
+            $this->toJson($answer);
+        });
     }
 
     public function gameStart(): void
     {
-        $answer = $this->service->gameStart($this->user, (int) $_POST['room_id']);
+        $this->ajaxProcessRequest(function () {
+            $answer = $this->service->gameStart(
+                $this->user,
+                PostData::get('room_id', RequestData::INT)
+            );
 
-        $this->toJson($answer);
+            $this->toJson($answer);
+        });
     }
 }

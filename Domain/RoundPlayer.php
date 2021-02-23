@@ -26,6 +26,11 @@ class RoundPlayer
         return new self($playerRoundId, $round, $gameId, $userId, $playerCards, $playerScores);
     }
 
+    public function getRound(): int
+    {
+        return $this->round;
+    }
+
     public function getGameId(): int
     {
         return $this->gameId;

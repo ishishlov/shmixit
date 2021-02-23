@@ -43,7 +43,7 @@ class Game
         $cardPlayers = $this->cardService->generatePlayersCards($roomUsers->getUserIds());
         $scorePlayers = ScorePlayers::createForStart($roomUsers->getUserIds());
         $roundPlayers = RoundPlayers::createFromCardsAndScores($game, $roomUsers, $cardPlayers, $scorePlayers);
-        $this->roundPlayerModel->create($roundPlayers);
+        $this->roundPlayerModel->save($roundPlayers);
 
         return $game;
     }

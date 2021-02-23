@@ -2,7 +2,8 @@
 
 class Route {
 	
-	public static function routing() {
+	public static function routing(): void
+    {
 		
 		$url = trim($_SERVER['REQUEST_URI']);
 		if (!$url || $url === '/' || $url === 'index') {

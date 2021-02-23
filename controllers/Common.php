@@ -14,9 +14,12 @@ class Common
 
 	public function __construct()
     {
-        $userId = (new Auth())->getUserId();
-        $this->user = (new User())->get($userId);
-        $this->tplData['currentUser'] = $this->user;
+        $this->processRequest(function () {
+            $userId = (new Auth())->getUserId();
+            $this->user = (new User())->get($userId);
+            $this->tplData['currentUser'] = $this->user;
+        });
+
     }
 
     public function display($template) {
@@ -24,7 +27,27 @@ class Common
 		$twig->display($template, $this->tplData);
 	}
 
-	public function toJson($data): void
+	protected function processRequest($callback): void
+    {
+        try {
+            $callback();
+        } catch (Throwable $e) {
+            trigger_error($e->getMessage());
+            $this->tplData['pageError'] = $e->getMessage();
+        }
+    }
+
+    protected function ajaxProcessRequest($callback): void
+    {
+        try {
+            $callback();
+        } catch (Throwable $e) {
+            trigger_error($e->getMessage());
+            $this->tplData['pageError'] = $e->getMessage();
+        }
+    }
+
+	protected function toJson($data): void
     {
 		print(json_encode($data));
 		exit;
@@ -51,7 +74,7 @@ class Common
 		return $data;
 	}
 
-	public function vd($data): void
+	public function dd($data): void
     {
 		echo '<pre>';
 		var_dump($data);

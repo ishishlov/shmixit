@@ -3,6 +3,7 @@
 namespace Models;
 
 use Domain\Room as Domain;
+use Domain\Rooms as RoomCollection;
 use PDO;
 
 class Rooms extends Main {
@@ -27,14 +28,32 @@ class Rooms extends Main {
         return $room;
     }
 
-    public function getRooms(array $statuses): array
+    /**
+     * @param int[] $statuses
+     * @return RoomCollection
+     */
+    public function getRooms(array $statuses): RoomCollection
     {
         $sqlStatuses = implode(', ', $statuses);
-        $sth = $this->_db->prepare(
+        $sth = $this->_db->query(
             'SELECT * FROM ' . self::TABLE_NAME . ' WHERE status IN(' . $sqlStatuses . ') ORDER BY room_id DESC'
         );
-        $sth->execute();
 
-        return $sth->fetchAll(PDO::FETCH_ASSOC);
+        $result = $sth->fetchAll(PDO::FETCH_ASSOC);
+        $rooms = [];
+
+        if ($result) {
+            foreach ($result as $room) {
+                $rooms[] = new Domain(
+                    $room['status'],
+                    $room['name'],
+                    $room['admin_user'],
+                    $room['status_name'],
+                    $room['date_create'],
+                    $room['room_id']);
+            }
+        }
+
+        return new RoomCollection($rooms);
     }
 }
