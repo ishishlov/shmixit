@@ -2,6 +2,8 @@
 
 use Domain\Word;
 use Services\Game as GameService;
+use Services\RequestData\GetData;
+use Services\RequestData\RequestData;
 
 class Game extends Common
 {
@@ -48,7 +50,7 @@ class Game extends Common
 
     private function getAnswer(?array $errors = []): array
     {
-        $gameId = 1;
+        $gameId = GetData::get('room_id', RequestData::INT) ?: 0;
         $game = $this->gameService->getGameProcess($this->user, $gameId);
 
         return [

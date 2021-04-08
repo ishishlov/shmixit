@@ -71,4 +71,15 @@ class Users
             $this->users
         );
     }
+
+    public function getByUserId(int $userId): ?User
+    {
+        foreach ($this->users as $user) {
+            if ($user->isEqual($userId)) {
+                return $user;
+            }
+        }
+
+        return null;
+    }
 }

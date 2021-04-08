@@ -2,7 +2,11 @@
 
 namespace Models;
 
+use Domain\CardPlayers;
+use Domain\GameRoundPlayer;
 use Domain\RoundPlayers;
+use Domain\GameRoundPlayers as Domain;
+use Domain\ScorePlayers;
 use PDO;
 
 class GameRoundPlayers extends Main {
@@ -13,6 +17,32 @@ class GameRoundPlayers extends Main {
     public function __construct()
     {
         parent::__construct(self::TABLE_NAME, self::ID_FIELD_NAME);
+    }
+
+    public function getByGameId(int $gameId): Domain
+    {
+        $sth = $this->_db->prepare(
+            'SELECT * FROM ' . self::TABLE_NAME . ' WHERE game_id = ?'
+        );
+        $sth->execute([$gameId]);
+        $models = $sth->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!$models) {
+            return Domain::createEmpty();
+        }
+
+        $gameRoundPlayer = [];
+        foreach ($models as $model) {
+            $gameRoundPlayer[] = GameRoundPlayer::create(
+                $model['game_round_player_id'],
+                $model['round'],
+                $model['player_id'],
+                $model['cards'] ? CardPlayers::fromJson($model['cards']) : null,
+                $model['score'] ? ScorePlayers::fromJson($model['score']) : null
+            );
+        }
+
+        return Domain::create($gameRoundPlayer);
     }
 
     public function save(RoundPlayers $roundPlayers): bool

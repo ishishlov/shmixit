@@ -2,10 +2,11 @@
 
 namespace Models;
 
-use Domain\CardPlayers;
 use Domain\Game;
-use Domain\ScorePlayers;
+use Domain\GameRound;
+use Domain\GameRounds as GameRoundsCollection;
 use PDO;
+use DateTimeImmutable;
 
 class GameRounds extends Main {
 
@@ -16,6 +17,44 @@ class GameRounds extends Main {
     public function __construct()
     {
         parent::__construct(self::TABLE_NAME, self::ID_FIELD_NAME);
+    }
+
+    public function getByGameId(int $gameId): GameRoundsCollection
+    {
+        $sth = $this->_db->prepare(
+            'SELECT * FROM ' . self::TABLE_NAME . ' WHERE game_id = ?'
+        );
+        $sth->execute([$gameId]);
+        $models = $sth->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!$models) {
+            return GameRoundsCollection::createEmpty();
+        }
+
+        $gameRoundPlayers = (new GameRoundPlayers())->getByGameId($models[0]['game_id']);
+        $gameRounds = [];
+        foreach ($models as $model) {
+            $dateOfWordSelection = $model['date_of_word_selection']
+                ? new DateTimeImmutable($model['date_of_word_selection'])
+                : null;
+            $dateFinish = $model['date_finish']
+                ? new DateTimeImmutable($model['date_finish'])
+                : null;
+
+            $gameRounds[] = GameRound::create(
+                $model['game_round_id'],
+                $model['round'],
+                $model['game_id'],
+                $model['status'],
+                $gameRoundPlayers->getByRound($model['round']),
+                new DateTimeImmutable($model['date_start']),
+                $dateOfWordSelection,
+                $dateFinish,
+                $model['word'] ?: null
+            );
+        }
+
+        return GameRoundsCollection::create($gameRounds);
     }
 
     public function save(Game $game)
@@ -29,26 +68,14 @@ class GameRounds extends Main {
             [
                 self::FIRST_ROUND,
                 $game->getGameId(),
-                $game->getDateStart(),
+                $game->getDateStart()->format('Y-m-d H:i:s'),
                 null,
                 null,
                 null,
                 $game->getStatus() // ToDo пересмотреть
             ]
         );
-        $gameRoundId = $res ? $this->_db->lastInsertId() : 0;
 
-        return $gameRoundId;
-    }
-
-    public function getRooms(array $statuses): array
-    {
-        $sqlStatuses = implode(', ', $statuses);
-        $sth = $this->_db->prepare(
-            'SELECT * FROM ' . self::TABLE_NAME . ' WHERE status IN(' . $sqlStatuses . ') ORDER BY room_id DESC'
-        );
-        $sth->execute();
-
-        return $sth->fetchAll(PDO::FETCH_ASSOC);
+        return $res ? $this->_db->lastInsertId() : 0;
     }
 }

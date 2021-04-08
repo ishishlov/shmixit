@@ -10,7 +10,7 @@ class DB {
 	private $_db = null;
 
 	const DEBUG_ENABLED = true;
-	const CONFIG_PATH = __DIR__ . '/../../config_shmixit.ini';
+	const CONFIG_PATH = __DIR__ . '/../config.ini';
 
     public function getInstance() {
 		if (!$this->_db) {

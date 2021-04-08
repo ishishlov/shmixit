@@ -43,10 +43,8 @@ class User
         if(!$userIds) {
             return Users::createEmpty();
         }
-        $usersDb = $this->model->getByIds($userIds);
-        $users = $this->map($usersDb);
 
-        return Users::create($users);
+        return $this->model->getByIds($userIds);
     }
 
     /**
@@ -54,10 +52,7 @@ class User
      */
     public function getAll(): Users
     {
-        $usersDb = $this->model->getAll();
-        $users = $this->map($usersDb);
-
-        return Users::create($users);
+        return $this->model->getAll();
     }
 
     public function save($name): array
@@ -99,20 +94,6 @@ class User
         $this->authService->logOut();
 
         return $this->getAnswer();
-    }
-
-    /**
-     * @param array $data
-     * @return Domain[]
-     */
-    private function map(array $data): array
-    {
-        $users = [];
-        foreach ($data as $user) {
-            $users[] = new Domain($user['user_id'], $user['name'], $user['avatar']);
-        }
-
-        return $users;
     }
 
     private function getAnswer(?string $error = ''): array

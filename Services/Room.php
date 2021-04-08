@@ -2,9 +2,11 @@
 
 namespace Services;
 
+use Domain\Rooms as RoomCollection;
 use Domain\ScorePlayers;
 use Models\RoomUsers;
 use Models\Rooms as Model;
+use Models\Users as UsersModel;
 use Domain\Room as Domain;
 use Domain\RoomStatuses;
 use Domain\User;
@@ -13,10 +15,11 @@ use Services\User as UserService;
 use Services\Game as GameService;
 use Exception;
 
-class Room
+class Room implements RoomContract
 {
     private const DEFAULT_ROOM_ID = 0;
-    private const DEFAULT_GAME_ID = 0;
+    private const DEFAULT_START_GAME_LINK = '';
+    private const START_GAME_LINK = 'game/play?id=%d';
 
     private $roomModel;
     private $roomUsersModel;
@@ -26,7 +29,7 @@ class Room
 
     public function __construct()
     {
-        $this->roomModel = new Model();
+        $this->roomModel = new Model(new UsersModel());
         $this->roomUsersModel = new RoomUsers();
         $this->userService = new UserService();
         $this->gameService = new GameService();
@@ -37,13 +40,11 @@ class Room
     {
         $rooms = $this->roomModel->getRooms(RoomStatuses::getAllStatuses());
 
-        if (!$rooms) {
+        if (!$rooms->isExists()) {
             return [];
         }
 
-        $roomsWithAdditionalData = $this->getAdditionalData($rooms);
-
-        return $this->map($roomsWithAdditionalData);
+        return $rooms->get();
     }
 
     public function createRoom(User $user, ?string $roomName = ''): array
@@ -130,8 +131,9 @@ class Room
         }
 
         $gameId = $this->startGame($room);
+        $startGameLink = sprintf(self::START_GAME_LINK, $gameId);
 
-        return $this->getAnswerForStart('', $gameId);
+        return $this->getAnswerForStart('', $startGameLink);
     }
 
     private function getAdditionalData(array $rooms): array
@@ -181,13 +183,13 @@ class Room
         return $users;
     }
 
-    private function getRoom(int $roomId): Domain
+    public function getRoom(int $roomId): Domain
     {
         $roomData = $this->roomModel->get($roomId);
         $roomDataWithAdditionalData = $this->getAdditionalData([$roomData]);
         $room = $this->map($roomDataWithAdditionalData);
 
-        return $room[0];
+        return array_shift($room);
     }
 
     private function getRoomUsers(int $roomId): RoomUsersDomain
@@ -234,11 +236,11 @@ class Room
         ];
     }
 
-    private function getAnswerForStart(string $error, ?int $gameId = self::DEFAULT_GAME_ID): array
+    private function getAnswerForStart(string $error, ?int $startGameLink = self::DEFAULT_START_GAME_LINK): array
     {
         return [
             'error' => $error,
-            'game_id' => $gameId
+            'start_game_link' => $startGameLink
         ];
     }
 

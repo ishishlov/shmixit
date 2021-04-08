@@ -2,6 +2,8 @@
 
 namespace Domain;
 
+use DateTimeInterface;
+
 class Game
 {
     private $gameId;
@@ -11,11 +13,11 @@ class Game
     private $dateEnd;
 
     public function __construct(
-        ?int $gameId,
-        ?Room $room,
-        ?int $status,
-        ?string $dateStart,
-        ?string $dateEnd = ''
+        Room $room,
+        int $status,
+        DateTimeInterface $dateStart,
+        ?DateTimeInterface $dateEnd = null,
+        ?int $gameId = null
     ) {
         $this->gameId = $gameId;
         $this->room = $room;
@@ -57,17 +59,17 @@ class Game
     }
 
     /**
-     * @return string
+     * @return DateTimeInterface
      */
-    public function getDateStart(): string
+    public function getDateStart(): DateTimeInterface
     {
         return $this->dateStart;
     }
 
     /**
-     * @return string|null
+     * @return DateTimeInterface|null
      */
-    public function getDateEnd(): ?string
+    public function getDateEnd(): ?DateTimeInterface
     {
         return $this->dateEnd;
     }

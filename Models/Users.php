@@ -3,9 +3,11 @@
 namespace Models;
 
 use Domain\User;
+use Domain\User as Domain;
+use Domain\Users as UsersList;
 use PDO;
 
-class Users extends Main {
+class Users extends Main implements UsersModels {
 
     private const TABLE_NAME = 'users';
     private const ID_FIELD_NAME = 'user_id';
@@ -15,28 +17,30 @@ class Users extends Main {
         parent::__construct(self::TABLE_NAME, self::ID_FIELD_NAME);
     }
 
-    public function getByIds(array $ids): array
+    public function getByIds(array $ids): UsersList
     {
         if (!$ids) {
-            return [];
+            return UsersList::createEmpty();
         }
 
         $sqlIds = implode(',', $ids);
         $sth = $this->_db->query(
             'SELECT * FROM ' . self::TABLE_NAME . ' WHERE user_id IN(' . $sqlIds . ')'
         );
+        $users = $sth->fetchAll(PDO::FETCH_ASSOC);
 
-        return $sth->fetchAll(PDO::FETCH_ASSOC);
+        return $this->map($users);
     }
 
     /**
      * @return User[]
      */
-    public function getAll(): array
+    public function getAll(): UsersList
     {
         $sth = $this->_db->query('SELECT * FROM ' . self::TABLE_NAME);
+        $users = $sth->fetchAll(PDO::FETCH_ASSOC);
 
-        return $sth->fetchAll(PDO::FETCH_ASSOC);
+        return $this->map($users);
     }
 
     public function delete(array $id): bool
@@ -64,5 +68,19 @@ class Users extends Main {
         $sth->execute([$name]);
 
         return (bool) $sth->rowCount();
+    }
+
+    /**
+     * @param array $data
+     * @return Domain[]
+     */
+    private function map(array $data): UsersList
+    {
+        $users = [];
+        foreach ($data as $user) {
+            $users[] = new Domain($user['user_id'], $user['name'], $user['avatar']);
+        }
+
+        return UsersList::create($users);
     }
 }

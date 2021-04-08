@@ -16,4 +16,9 @@ class Rooms
     {
         return $this->rooms;
     }
+
+    public function isExists(): bool
+    {
+        return count($this->rooms) > 0;
+    }
 }

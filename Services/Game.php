@@ -2,6 +2,7 @@
 
 namespace Services;
 
+use Services\Room as RoomService;
 use Domain\GameStatuses;
 use Domain\RoomUsers;
 use Domain\RoundPlayers;
@@ -13,6 +14,7 @@ use Models\Games as Model;
 use Domain\Game as Domain;
 use Domain\Room;
 use Domain\User;
+use DateTimeImmutable;
 
 class Game
 {
@@ -27,7 +29,7 @@ class Game
 
     public function __construct()
     {
-        $this->gameModel = new Model();
+        $this->gameModel = new Model(new RoomService());
         $this->roundModel = new GameRounds();
         $this->roundPlayerModel = new GameRoundPlayers();
         $this->cardService = new CardService();
@@ -35,8 +37,7 @@ class Game
 
     public function create(Room $room, RoomUsers $roomUsers): Domain
     {
-        $date = date('Y-m-d H:i:s');
-        $game = new Domain(null, $room, GameStatuses::getActiveStatus(), $date);
+        $game = new Domain($room, GameStatuses::getActiveStatus(), new DateTimeImmutable());
         $this->gameModel->save($game);
         $this->roundModel->save($game);
 
@@ -55,7 +56,7 @@ class Game
 
     public function getGameProcess(User $user, int $gameId): Domain
     {
-
+        $gameRounds = $this->roundModel->getByGameId($gameId);
     }
 
     public function saveWord(Word $word, int $gameId): Word
@@ -69,4 +70,6 @@ class Game
 
         return $word;
     }
+
+
 }

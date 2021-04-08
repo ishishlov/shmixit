@@ -4,6 +4,7 @@ namespace Models;
 
 use Domain\Room as Domain;
 use Domain\Rooms as RoomCollection;
+use Domain\RoomStatuses;
 use PDO;
 
 class Rooms extends Main {
@@ -11,9 +12,13 @@ class Rooms extends Main {
     private const TABLE_NAME = 'rooms';
     private const ID_FIELD_NAME = 'room_id';
 
-    public function __construct()
+    /** @var null  */
+    private $usersModel = null;
+
+    public function __construct(UsersModels $usersModel)
     {
         parent::__construct(self::TABLE_NAME, self::ID_FIELD_NAME);
+        $this->usersModel = $usersModel;
     }
 
     public function save(Domain $room): Domain
@@ -43,12 +48,15 @@ class Rooms extends Main {
         $rooms = [];
 
         if ($result) {
+            $adminUserIds = array_column($result, 'admin_user_id');
+            $adminUsers = $this->usersModel->getByIds($adminUserIds);
+
             foreach ($result as $room) {
                 $rooms[] = new Domain(
                     $room['status'],
                     $room['name'],
-                    $room['admin_user'],
-                    $room['status_name'],
+                    $adminUsers->getByUserId($room['admin_user_id']),
+                    RoomStatuses::getName($room['status']),
                     $room['date_create'],
                     $room['room_id']);
             }
