@@ -4,7 +4,7 @@ namespace Models;
 
 use Domain\Game;
 use Domain\GameRound;
-use Domain\GameRounds as GameRoundsCollection;
+use Domain\GameProcess;
 use PDO;
 use DateTimeImmutable;
 
@@ -19,7 +19,7 @@ class GameRounds extends Main {
         parent::__construct(self::TABLE_NAME, self::ID_FIELD_NAME);
     }
 
-    public function getByGameId(int $gameId): GameRoundsCollection
+    public function getByGameId(int $gameId): GameProcess
     {
         $sth = $this->_db->prepare(
             'SELECT * FROM ' . self::TABLE_NAME . ' WHERE game_id = ?'
@@ -28,7 +28,7 @@ class GameRounds extends Main {
         $models = $sth->fetchAll(PDO::FETCH_ASSOC);
 
         if (!$models) {
-            return GameRoundsCollection::createEmpty();
+            return GameProcess::createEmpty();
         }
 
         $gameRoundPlayers = (new GameRoundPlayers())->getByGameId($models[0]['game_id']);
@@ -54,13 +54,23 @@ class GameRounds extends Main {
             );
         }
 
-        return GameRoundsCollection::create($gameRounds);
+        return GameProcess::create($gameRounds);
+    }
+
+    public function getLastRoundStatus(int $gameId): int
+    {
+        $sth = $this->_db->prepare(
+            'SELECT status FROM ' . self::TABLE_NAME . ' WHERE game_id = ? AND round = (SELECT MAX(round) FROM ' . self::TABLE_NAME . ' WHERE game_id = ?)'
+        );
+        $sth->execute([$gameId, $gameId]);
+
+        return $sth->fetch(PDO::FETCH_COLUMN);
     }
 
     public function save(Game $game)
     {
         $stmt = $this->_db->prepare(
-            'INSERT INTO ' . self::TABLE_NAME . ' (round, game_id,
+            'INSERT INTO ' . self::TABLE_NAME . ' (round, game_id, move_player_id, 
             date_start, date_of_word_selection, date_finish, word, status)
             VALUES (?, ?, ?, ?, ?, ?, ?)'
         );

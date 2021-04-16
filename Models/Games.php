@@ -28,6 +28,7 @@ class Games extends Main {
         return new Game(
             $room,
             $gameModel['status'],
+            $gameModel['move_order'],
             $gameModel['date_start'] ? new DateTimeImmutable($gameModel['date_start']) : null,
             $gameModel['date_end'] ? new DateTimeImmutable($gameModel['date_end']) : null,
             $gameId
@@ -37,12 +38,13 @@ class Games extends Main {
     public function save(Game $game): Game
     {
         $stmt = $this->_db->prepare(
-            'INSERT INTO ' . self::TABLE_NAME . ' (room_id, date_start, status) VALUES (?, ?, ?)'
+            'INSERT INTO ' . self::TABLE_NAME . ' (room_id, date_start, status, move_order) VALUES (?, ?, ?, ?)'
         );
         $res = $stmt->execute([
             $game->getRoom()->getRoomId(),
             $game->getDateStart()->format('Y-m-d H:i:s'),
-            $game->getStatus()
+            $game->getStatus(),
+            $game->getMoveOrder()
         ]);
         $gameId = $res ? $this->_db->lastInsertId() : 0;
         $game->setGameId($gameId);

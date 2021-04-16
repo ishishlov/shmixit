@@ -18,10 +18,9 @@ class Game extends Common
 
     public function play(): void
     {
-        $answer = $this->getAnswer();
-        foreach ($answer as $key => $data) {
-            $this->tplData[$key] =$data;
-        }
+        $gameId = GetData::get('game_id', RequestData::INT) ?: 0;
+        $answer = $this->gameService->getGameProcess($this->user, $gameId);
+        $this->appendTplData($answer);
 
         $this->display('play.tpl');
     }
@@ -32,8 +31,16 @@ class Game extends Common
         if (!$this->isAjax()) {
             $errors[] = 'Ooops, something wrong';
         }
+        $gameId = GetData::get('game_id', RequestData::INT) ?: 0;
+        $status = GetData::get('status', RequestData::INT) ?: 0;
+        $lastRoundStatus = $this->gameService->getLastRoundStatus($gameId);
 
-        $this->toJson($this->getAnswer($errors));
+        if ($status === $lastRoundStatus) {
+            $response = $this->gameService->getResponse(false, $this->user, $errors);
+            $this->toJson($response);
+        }
+
+        $this->toJson($this->gameService->getGameProcess($this->user, $gameId, true, $errors));
     }
 
     public function makeWord(): void
@@ -46,22 +53,5 @@ class Game extends Common
         $this->gameService->saveWord($word);
 
         $this->toJson(['errors' => $word->getErrors()]);
-    }
-
-    private function getAnswer(?array $errors = []): array
-    {
-        $gameId = GetData::get('room_id', RequestData::INT) ?: 0;
-        $game = $this->gameService->getGameProcess($this->user, $gameId);
-
-        return [
-            'myMove' => false,
-            'word' => '',
-            'round' => 1,
-            'action' => 1,
-            'guest' => false,
-            'players' => [],
-            'cards' => 0,
-            'errors' => $errors
-        ];
     }
 }

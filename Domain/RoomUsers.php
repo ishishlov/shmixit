@@ -57,4 +57,12 @@ class RoomUsers
     {
         return $this->users->getUserIds();
     }
+
+    public function createMoveOrder(): string
+    {
+        $userIds = $this->users->getUserIds();
+        shuffle($userIds);
+
+        return implode(',', $userIds);
+    }
 }

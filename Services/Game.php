@@ -2,6 +2,7 @@
 
 namespace Services;
 
+use Domain\GameProcess;
 use Services\Room as RoomService;
 use Domain\GameStatuses;
 use Domain\RoomUsers;
@@ -37,7 +38,8 @@ class Game
 
     public function create(Room $room, RoomUsers $roomUsers): Domain
     {
-        $game = new Domain($room, GameStatuses::getActiveStatus(), new DateTimeImmutable());
+        $moveOrder = $roomUsers->createMoveOrder();
+        $game = new Domain($room, GameStatuses::getActiveStatus(), $moveOrder, new DateTimeImmutable());
         $this->gameModel->save($game);
         $this->roundModel->save($game);
 
@@ -49,14 +51,11 @@ class Game
         return $game;
     }
 
-    public function play()
+    public function getGameProcess(User $user, int $gameId, bool $needToUpdate, ?array $errors = []): array
     {
-        $gameId = (int) $_GET('game_id');
-    }
+        $gameProcess = $this->roundModel->getByGameId($gameId);
 
-    public function getGameProcess(User $user, int $gameId): Domain
-    {
-        $gameRounds = $this->roundModel->getByGameId($gameId);
+        return $this->getResponse($needToUpdate, $user, $errors, $gameProcess);
     }
 
     public function saveWord(Word $word, int $gameId): Word
@@ -71,5 +70,30 @@ class Game
         return $word;
     }
 
+    public function getLastRoundStatus(int $gameId): int
+    {
+        return $this->roundModel->getLastRoundStatus($gameId);
+    }
 
+    public function getResponse(bool $needToUpdate, User $user, ?array $errors = [], ?GameProcess $gameProcess = null): array
+    {
+        $gameProcessData = [];
+        if ($gameProcess) {
+            $gameProcessData = [
+                'myMove' => $gameProcess->isMyMove($user),
+                'word' => $gameProcess->getWord(),
+                'round' => $gameProcess->getRound(),
+                'guest' => $user->isGuest(),
+                'players' => [],
+                'cards' => 0,
+                'status' => $gameProcess->getStatus(),
+            ];
+        }
+
+        return [
+            'needToUpdate' => $needToUpdate,
+            'gameProcess' => $gameProcessData,
+            'errors' => $errors
+        ];
+    }
 }

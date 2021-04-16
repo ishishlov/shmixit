@@ -9,6 +9,7 @@ class GameRound
     private $gameRoundId;
     private $round;
     private $gameId;
+    private $movePlayerId;
     private $dateStart;
     private $dateOfWordSelection;
     private $dateFinish;
@@ -20,6 +21,7 @@ class GameRound
         int $gameRoundId,
         int $round,
         int $gameId,
+        int $movePlayerId,
         int $status,
         $gameRoundPlayers,
         DateTimeInterface $dateStart,
@@ -30,6 +32,7 @@ class GameRound
         $this->gameRoundId = $gameRoundId;
         $this->round = $round;
         $this->gameId = $gameId;
+        $this->movePlayerId = $movePlayerId;
         $this->dateStart = $dateStart;
         $this->dateOfWordSelection = $dateOfWordSelection;
         $this->dateFinish = $dateFinish;
@@ -42,6 +45,7 @@ class GameRound
         int $gameRoundId,
         int $round,
         int $gameId,
+        int $movePlayerId,
         int $status,
         $gameRoundPlayers,
         DateTimeInterface $dateStart,
@@ -53,6 +57,7 @@ class GameRound
             $gameRoundId,
             $round,
             $gameId,
+            $movePlayerId,
             $status,
             $gameRoundPlayers,
             $dateStart,
@@ -60,5 +65,25 @@ class GameRound
             $dateFinish,
             $word
         );
+    }
+
+    public function getWord(): ?string
+    {
+        return $this->word;
+    }
+
+    public function getRound(): int
+    {
+        return $this->round;
+    }
+
+    public function getStatus(): int
+    {
+        return $this->round;
+    }
+
+    public function isMyMove(User $user): bool
+    {
+        return $user->isEqual($this->movePlayerId);
     }
 }

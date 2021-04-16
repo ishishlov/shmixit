@@ -11,10 +11,12 @@ class Game
     private $status;
     private $dateStart;
     private $dateEnd;
+    private $moveOrder;
 
     public function __construct(
         Room $room,
         int $status,
+        string $moveOrder,
         DateTimeInterface $dateStart,
         ?DateTimeInterface $dateEnd = null,
         ?int $gameId = null
@@ -24,6 +26,7 @@ class Game
         $this->status = $status;
         $this->dateStart = $dateStart;
         $this->dateEnd = $dateEnd;
+        $this->moveOrder = $moveOrder;
     }
 
     /**
@@ -72,5 +75,10 @@ class Game
     public function getDateEnd(): ?DateTimeInterface
     {
         return $this->dateEnd;
+    }
+
+    public function getMoveOrder(): string
+    {
+        return $this->moveOrder;
     }
 }
